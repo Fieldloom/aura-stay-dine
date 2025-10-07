@@ -16,6 +16,7 @@ export default {
       fontFamily: {
         sans: ['Poppins', 'system-ui', 'sans-serif'],
       },
+      fontDisplay: ['swap'],
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
