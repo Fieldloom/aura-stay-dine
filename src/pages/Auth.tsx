@@ -4,24 +4,120 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { ArrowLeft, Sparkles } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 const Auth = () => {
   const [isLoading, setIsLoading] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [fullName, setFullName] = useState("");
+  const navigate = useNavigate();
+  const { toast } = useToast();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    // TODO: Implement authentication logic
-    setTimeout(() => setIsLoading(false), 1500);
+
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Success!",
+        description: "You've been logged in successfully.",
+      });
+
+      navigate("/");
+    } catch (error: any) {
+      console.error("Login error:", error);
+      toast({
+        title: "Login failed",
+        description: error.message || "Please check your credentials and try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (password !== confirmPassword) {
+      toast({
+        title: "Passwords don't match",
+        description: "Please make sure your passwords match.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsLoading(true);
-    // TODO: Implement registration logic
-    setTimeout(() => setIsLoading(false), 1500);
+
+    try {
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          emailRedirectTo: `${window.location.origin}/`,
+          data: {
+            full_name: fullName,
+          }
+        }
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Account created!",
+        description: "Welcome to Stay & Dine. You can now sign in.",
+      });
+
+      // Switch to login tab after successful signup
+      setEmail("");
+      setPassword("");
+      setConfirmPassword("");
+      setFullName("");
+    } catch (error: any) {
+      console.error("Signup error:", error);
+      toast({
+        title: "Signup failed",
+        description: error.message || "Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleGoogleLogin = async () => {
+    setIsLoading(true);
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/`,
+        }
+      });
+
+      if (error) throw error;
+    } catch (error: any) {
+      console.error("Google login error:", error);
+      toast({
+        title: "Login failed",
+        description: error.message || "Please try again.",
+        variant: "destructive",
+      });
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -60,7 +156,9 @@ const Auth = () => {
                     <Input 
                       id="email" 
                       type="email" 
-                      placeholder="you@example.com" 
+                      placeholder="you@example.com"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
                       required 
                     />
                   </div>
@@ -69,7 +167,9 @@ const Auth = () => {
                     <Input 
                       id="password" 
                       type="password" 
-                      placeholder="••••••••" 
+                      placeholder="••••••••"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
                       required 
                     />
                   </div>
@@ -104,6 +204,7 @@ const Auth = () => {
                     variant="outline" 
                     className="w-full"
                     disabled={isLoading}
+                    onClick={handleGoogleLogin}
                   >
                     <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
                       <path
@@ -145,7 +246,9 @@ const Auth = () => {
                     <Input 
                       id="fullname" 
                       type="text" 
-                      placeholder="John Doe" 
+                      placeholder="John Doe"
+                      value={fullName}
+                      onChange={(e) => setFullName(e.target.value)}
                       required 
                     />
                   </div>
@@ -154,7 +257,9 @@ const Auth = () => {
                     <Input 
                       id="signup-email" 
                       type="email" 
-                      placeholder="you@example.com" 
+                      placeholder="you@example.com"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
                       required 
                     />
                   </div>
@@ -163,7 +268,9 @@ const Auth = () => {
                     <Input 
                       id="signup-password" 
                       type="password" 
-                      placeholder="••••••••" 
+                      placeholder="••••••••"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
                       required 
                     />
                   </div>
@@ -172,7 +279,9 @@ const Auth = () => {
                     <Input 
                       id="confirm-password" 
                       type="password" 
-                      placeholder="••••••••" 
+                      placeholder="••••••••"
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
                       required 
                     />
                   </div>
@@ -201,6 +310,7 @@ const Auth = () => {
                     variant="outline" 
                     className="w-full"
                     disabled={isLoading}
+                    onClick={handleGoogleLogin}
                   >
                     <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
                       <path
