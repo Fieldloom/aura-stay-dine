@@ -58,6 +58,12 @@ const Index = () => {
                 Explore Now
               </Button>
             </Link>
+            <Link to="/ai-chat">
+              <Button variant="hero" size="lg">
+                <Sparkles className="w-4 h-4 mr-2" />
+                Try AI Concierge
+              </Button>
+            </Link>
             <Link to="/auth">
               <Button variant="outline" size="lg" className="bg-card/50 backdrop-blur-sm border-accent/20 hover:bg-card/80">
                 Sign In

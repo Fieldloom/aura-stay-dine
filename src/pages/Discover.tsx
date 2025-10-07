@@ -44,8 +44,11 @@ const Discover = () => {
           </Link>
 
           <nav className="flex items-center gap-4">
-            <Link to="/auth">
-              <Button variant="ghost">Sign In</Button>
+            <Link to="/ai-chat">
+              <Button variant="ghost">
+                <Sparkles className="w-4 h-4 mr-2" />
+                AI Chat
+              </Button>
             </Link>
             <Link to="/auth">
               <Button variant="premium">Get Started</Button>
