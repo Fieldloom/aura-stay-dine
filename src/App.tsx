@@ -8,6 +8,7 @@ import Auth from "./pages/Auth";
 import Discover from "./pages/Discover";
 import AIChat from "./pages/AIChat";
 import NotFound from "./pages/NotFound";
+import PWAInstallPrompt from "./components/PWAInstallPrompt";
 
 const queryClient = new QueryClient();
 
@@ -26,6 +27,7 @@ const App = () => (
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
+      <PWAInstallPrompt />
     </TooltipProvider>
   </QueryClientProvider>
 );
